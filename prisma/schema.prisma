@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  password      String
+  name          String
+  plan          String   @default("free")
+  planActive    Boolean  @default(false)
+  leadsUsed     Int      @default(0)
+  createdAt     DateTime @default(now())
+  leads         Lead[]
+  campaigns     Campaign[]
+}
+
+model Lead {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  company        String
+  website        String?
+  email          String
+  senderEmail    String?
+  status         String   @default("New")
+  dateSent       String?
+  followUpCount  Int      @default(0)
+  lastFollowUp   String?
+  lastReply      String?
+  replyCategory  String?
+  score          Int?
+  scoreReason    String?
+  meetingBooked  Boolean  @default(false)
+  source         String   @default("manual")
+  createdAt      DateTime @default(now())
+}
+
+model Campaign {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  name      String
+  status    String   @default("draft")
+  emailsSent Int     @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Payment {
+  id            String   @id @default(cuid())
+  userId        String
+  razorpayId    String?
+  plan          String
+  amount        Int
+  status        String   @default("pending")
+  createdAt     DateTime @default(now())
+}
